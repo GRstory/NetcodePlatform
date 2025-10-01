@@ -19,7 +19,7 @@ public class UI_Lobby : MonoBehaviour
     [SerializeField] private GameObject _selectGameModePanel;
     [SerializeField] private TMP_Dropdown _gameModeDropdown;
 
-    [Header("Info Panel")]
+    [Header("Info Panel 2")]
     [SerializeField] private TMP_Text _statusText;
     [SerializeField] private TMP_InputField _nameField;
     [SerializeField] private Button _changeNameButton;
