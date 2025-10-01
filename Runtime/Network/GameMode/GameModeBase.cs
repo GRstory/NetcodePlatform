@@ -58,6 +58,10 @@ public abstract class GameModeBase
 
     public abstract void OnPlayerKilled(ulong playerId);
     public abstract void RequestRespawn();
+    public void ResetGame()
+    {
+        RespawnAllPlayers();
+    }
 
     public virtual void SpawnAllPlayers()
     {
