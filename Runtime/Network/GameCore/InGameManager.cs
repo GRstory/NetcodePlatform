@@ -7,10 +7,12 @@ using System.Reflection;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class InGameManager : SingletonNetwork<InGameManager>
 {
     public static event Action<List<InGameLog>> OnLogUpdated;
+    public static event Action OnGameReset;
 
     [Header("Game Settings")]
     [SerializeField] private List<GameModeStruct> _gameModeStructList = new List<GameModeStruct>();
@@ -52,7 +54,7 @@ public class InGameManager : SingletonNetwork<InGameManager>
         {
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= OnLoadEventCompleted;
 
-            SpawnAllPlayers();
+            _currentGameMode.SpawnAllPlayers();
         }
     }
 
@@ -94,59 +96,34 @@ public class InGameManager : SingletonNetwork<InGameManager>
 
     private GameModeBase GetGameMode(EGameModeType gameModeType, GameStateBase gameState)
     {
-        if(_gameModeTypeDict.TryGetValue(gameModeType, out Type value))
+        if (_gameModeTypeDict.TryGetValue(gameModeType, out Type value))
         {
             return (GameModeBase)Activator.CreateInstance(value, gameState);
         }
         return null;
     }
 
-    private void SpawnAllPlayers()
+    public GameModeStruct GetGameModeStruct()
     {
-        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
-        {
-            AddLog($"InGameManager - SpawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
-            SpawnPlayer(clientId);
-        }
+        EGameModeType currentGameModeType = GameSessionSettings.Instance.SelectedGameMode.Value;
+        return _gameModeStructList.FirstOrDefault(x => x.GameModeType == currentGameModeType);
+    }
+
+    public void ExitGame()
+    {
+        NetworkManager.Singleton.Shutdown();
+        SceneManager.LoadScene("Lobby");
+    }
+
+    public void RequestReplay()
+    {
+        if (!IsServer) return;
 
         if(_currentGameMode != null)
         {
-            _currentGameMode.OnAllPlayerSpawned();
+            _currentGameMode.ResetGame();
         }
-    }
-
-    private void SpawnPlayer(ulong clientId)
-    {
-        //플레이어 스폰
-        EGameModeType currentGameModeType = GameSessionSettings.Instance.SelectedGameMode.Value;
-        GameModeStruct currentGameModeStruct = _gameModeStructList.FirstOrDefault(x => x.GameModeType == currentGameModeType);
-
-        if (currentGameModeStruct.PlayerPrefab == null)
-        {
-            Debug.LogError($"PlayerPrefab for GameMode '{currentGameModeType}' is not assigned in the ServerGameManager.");
-            return;
-        }
-        GameObject playerPrefab = currentGameModeStruct.PlayerPrefab;
-
-        Vector3 spawnPos = Vector3.zero;
-        GameObject playerInstance = Instantiate(playerPrefab, spawnPos, Quaternion.identity);
-        NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
-        networkObject.SpawnAsPlayerObject(clientId);
-
-        //플레이어 설정
-        FixedString32Bytes playerName = $"Player {clientId}";
-        foreach (var playerData in GameSessionSettings.Instance.PlayerDatasInGame)
-        {
-            if (playerData.ClientId == clientId)
-            {
-                playerName = playerData.PlayerName;
-                break;
-            }
-        }
-        if(playerInstance.TryGetComponent<SamplePlayerController>(out SamplePlayerController samplePlayerController))
-        {
-            samplePlayerController.PlayerName.Value = playerName;
-        }
+        OnGameReset?.Invoke();
     }
 
     #region Log System

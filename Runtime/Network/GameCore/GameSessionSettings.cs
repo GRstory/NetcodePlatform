@@ -18,12 +18,11 @@ public class GameSessionSettings : NetworkBehaviour
             null,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server);
+    }
 
-
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCheck;
-        }
+    private void Start()
+    {
+        NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCheck;
     }
 
     public override void OnDestroy()

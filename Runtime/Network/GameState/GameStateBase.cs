@@ -26,8 +26,8 @@ public abstract class GameStateBase : SingletonNetwork<GameStateBase>
         CurrentPhase.Value = phase;
     }
 
-    private void CurrentPhaseOnValueChanged(EGamePhase old, EGamePhase newPhase)
+    protected virtual void CurrentPhaseOnValueChanged(EGamePhase oldPhase, EGamePhase newPhase)
     {
-        InGameManager.Instance.AddLog($"GameState - Phase Changed: OLD: {old} | NEW: {newPhase}", ELogLevel.SystemInfo);
+        InGameManager.Instance.AddLog($"GameState - Phase Changed: OLD: {oldPhase} | NEW: {newPhase}", ELogLevel.SystemInfo);
     }
 }

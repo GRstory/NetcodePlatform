@@ -1,4 +1,5 @@
 using System;
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -57,6 +58,36 @@ public abstract class GameModeBase
 
     public abstract void OnPlayerKilled(ulong playerId);
     public abstract void RequestRespawn();
+
+    public virtual void SpawnAllPlayers()
+    {
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
+        {
+            InGameManager.Instance.AddLog($"GameMode - SpawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
+            SpawnPlayer(clientId);
+        }
+
+        OnAllPlayerSpawned();
+    }
+
+    public virtual void RespawnAllPlayers()
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+        InGameManager.Instance.AddLog($"GameMode - RspawnAllPlayer", ELogLevel.SystemInfo);
+
+        foreach (var client in NetworkManager.Singleton.ConnectedClients.Values)
+        {
+            if (client.PlayerObject != null)
+            {
+                client.PlayerObject.Despawn(true);
+            }
+        }
+
+        SpawnAllPlayers();
+    }
+
+    protected abstract void SpawnPlayer(ulong clientId);
+    protected abstract void RespawnPlayer(ulong clientId);
 }
 
 [AttributeUsage(AttributeTargets.Class)]
