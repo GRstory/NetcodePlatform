@@ -2,11 +2,13 @@
   "name": "com.grstory.netcode_platform",
   "version": "1.0.0",
   "displayName": "Multiplay Netcode Platform",
-  "description": "Netcode for Object와 Relay를 사용합니다.",
+  "description": "Netcode for Object\uc640 Relay\ub97c \uc0ac\uc6a9\ud569\ub2c8\ub2e4.",
   "unity": "2022.3",
   "dependencies": {
     "com.unity.netcode.gameobjects": "1.12.2",
-    "com.unity.services.relay": "1.2.0"
+    "com.unity.services.relay": "1.2.0",
+    "com.unity.textmeshpro": "3.0.7",
+    "com.unity.collections": "1.2.4"
   },
   "keywords": [],
   "author": {
@@ -15,9 +17,9 @@
   },
   "samples": [
     {
-      "displayName": "샘플",
-      "description": "샘플임",
-      "path": "Samples~/Reference"
+      "displayName": "\uc0d8\ud50c",
+      "description": "\uc0d8\ud50c\uc784",
+      "path": "Samples~/"
     }
   ]
 }

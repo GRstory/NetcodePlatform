@@ -1,12 +1,12 @@
 using System;
 using System.Threading.Tasks;
-using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
+using Unity.Collections;
 using UnityEngine;
 
 public class LobbyManager : SingletonNetwork<LobbyManager>
