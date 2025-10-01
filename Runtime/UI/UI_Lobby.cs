@@ -15,6 +15,7 @@ public class UI_Lobby : MonoBehaviour
     [SerializeField] private TMP_InputField _joinCodeField;
 
     [Header("Select Panel")]
+    [SerializeField] private Button _breakLobbyButton;
     [SerializeField] private Button _startButton;
     [SerializeField] private GameObject _selectGameModePanel;
     [SerializeField] private TMP_Dropdown _gameModeDropdown;
@@ -36,6 +37,7 @@ public class UI_Lobby : MonoBehaviour
         _hostButton.onClick.AddListener(() => LobbyManager.Instance.CreateLobby());
         _joinButton.onClick.AddListener(() => LobbyManager.Instance.JoinLobby(_joinCodeField.text));
         _startButton.onClick.AddListener(() => LobbyManager.Instance.StartGame());
+        _breakLobbyButton.onClick.AddListener(() => LobbyManager.Instance.ShutdownLobby());
         _changeNameButton.onClick.AddListener(HandleSetPlayerNameChanged);
         _gameModeDropdown.onValueChanged.AddListener(HandleGameModeDropdownValueChanged);
         _selectGameModePanel.SetActive(false);

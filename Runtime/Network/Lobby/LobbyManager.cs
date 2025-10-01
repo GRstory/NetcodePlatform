@@ -188,6 +188,7 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         if(!IsServer) return;
 
         NetworkManager.Singleton.Shutdown();
+        OnLobbyStateChanged?.Invoke(ELobbyState.Idle, "Lobby was shutdowned");
     }
 
     public void LeaveLobby()
