@@ -120,4 +120,9 @@ public class UI_Lobby : MonoBehaviour
             LobbyManager.Instance.SetPlayerName(nickname);
         }
     }
+
+    private void HandleTest()
+    {
+
+    }
 }
