@@ -10,6 +10,7 @@ public class GameSessionSettings : NetworkBehaviour
     public NetworkVariable<EGameModeType> SelectedGameMode = new NetworkVariable<EGameModeType>(EGameModeType.Default);
     public NetworkVariable<bool> IsGameStarted = new NetworkVariable<bool>(false);
     public NetworkList<PlayerData> PlayerDatasInGame { get; private set; }
+    public int MaxPlayerCount = 0;
 
     private void Awake()
     {
@@ -17,6 +18,18 @@ public class GameSessionSettings : NetworkBehaviour
             null,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server);
+
+
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCheck;
+        }
+    }
+
+    public override void OnDestroy()
+    {
+        NetworkManager.Singleton.ConnectionApprovalCallback -= HandleConnectionApprovalCheck;
+        base.OnDestroy();
     }
 
     public override void OnNetworkSpawn()
@@ -28,5 +41,23 @@ public class GameSessionSettings : NetworkBehaviour
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void HandleConnectionApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+    {
+        if (IsGameStarted.Value)
+        {
+            response.Reason = "Game has already started.";
+            response.Approved = false;
+        }
+        else if(LobbyManager.Instance.CurrentPlayerCount >= MaxPlayerCount)
+        {
+            response.Reason = "Lobby is full.";
+            response.Approved = false;
+        }
+        else
+        {
+            response.Approved = true;
+        }
     }
 }

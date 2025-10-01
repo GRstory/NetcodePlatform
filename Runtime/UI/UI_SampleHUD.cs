@@ -73,7 +73,7 @@ public class UI_SampleHUD : MonoBehaviour
         }
     }
 
-    private void HandleScrollLog(List<LogClass> logListRef)
+    private void HandleScrollLog(List<InGameLog> logListRef)
     {
         int numLine = Math.Min(logListRef.Count, 30);
         int beginLog = logListRef.Count - numLine;
@@ -88,7 +88,7 @@ public class UI_SampleHUD : MonoBehaviour
             int currentIndex = beginLog + i;
             if (currentIndex >= logListRef.Count) break;
 
-            LogClass currentLog = logListRef[currentIndex];
+            InGameLog currentLog = logListRef[currentIndex];
             if (!_logColorDict.TryGetValue(currentLog.LogLevel, out string colorHex))
             {
                 colorHex = "#FFFFFF"; // ±âº»°ª

@@ -45,6 +45,20 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         {
             OnLobbyStateChanged?.Invoke(ELobbyState.Error, "Unity 서비스 초기화 실패.");
         }
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect_OnClient;
+        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected_OnClient;
+    }
+
+    public override void OnDestroy()
+    {
+        if (NetworkManager.Singleton != null)
+        {
+            NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect_OnClient;
+            NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected_OnClient;
+        }
+
+        base.OnDestroy();
     }
 
     #region NetworkBehaviour
@@ -57,8 +71,8 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         }
         if(IsClient)
         {
-            NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect_OnClient;
-            NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected_OnClient;
+            //NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect_OnClient;
+            //NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected_OnClient;
         }
     }
 
@@ -71,8 +85,8 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         }
         if (IsClient)
         {
-            NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect_OnClient;
-            NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected_OnClient;
+            //NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect_OnClient;
+            //NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected_OnClient;
         }
     }
     #endregion
@@ -118,6 +132,7 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
             if(PlayerDataList.Count > 0) PlayerDataList.Clear();
 
             NetworkManager.Singleton.StartHost();
+            GameSessionSettings.Instance.MaxPlayerCount = MaxPlayer;
             OnLobbyStateChanged?.Invoke(ELobbyState.HostSuccess, joinCode);
         }
         catch (Exception e)
@@ -146,7 +161,6 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
             );
 
             NetworkManager.Singleton.StartClient();
-            OnLobbyStateChanged?.Invoke(ELobbyState.ClientSuccess, "connected");
         }
         catch (Exception e)
         {
@@ -215,6 +229,7 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         //미리 지정된 이름으로 변경
         if(clientId == NetworkManager.Singleton.LocalClientId)
         {
+            OnLobbyStateChanged?.Invoke(ELobbyState.ClientSuccess, "connected");
             SetPlayerName(_playerNameCache);
         }
     }
@@ -241,7 +256,8 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         }
         else
         {
-            OnLobbyStateChanged?.Invoke(ELobbyState.Idle, "you have been disconnected from server");
+            //OnLobbyStateChanged?.Invoke(ELobbyState.Idle, NetworkManager.Singleton.DisconnectReason);
+            OnLobbyStateChanged?.Invoke(ELobbyState.Idle, "Lobby is full or unavailable");
         }
 
         _isKicked = false;

@@ -10,7 +10,7 @@ using UnityEngine;
 
 public class InGameManager : SingletonNetwork<InGameManager>
 {
-    public static event Action<List<LogClass>> OnLogUpdated;
+    public static event Action<List<InGameLog>> OnLogUpdated;
 
     [Header("Game Settings")]
     [SerializeField] private List<GameModeStruct> _gameModeStructList = new List<GameModeStruct>();
@@ -19,7 +19,7 @@ public class InGameManager : SingletonNetwork<InGameManager>
     private GameModeBase _currentGameMode;
     private int _clientsLoadedSceneCount = 0;
     //Log
-    private List<LogClass> _logList = new List<LogClass>();
+    private List<InGameLog> _logList = new List<InGameLog>();
 
     private void Update()
     {
@@ -152,7 +152,7 @@ public class InGameManager : SingletonNetwork<InGameManager>
     #region Log System
     public void AddLog(string log, ELogLevel logLevel = ELogLevel.Info)
     {
-        _logList.Add(new LogClass(log, logLevel));
+        _logList.Add(new InGameLog(log, logLevel));
         OnLogUpdated?.Invoke(_logList);
     }
 
@@ -174,20 +174,4 @@ public struct GameModeStruct
     public EGameModeType GameModeType;
     public GameObject GameStatePrefab;
     public GameObject PlayerPrefab;
-}
-
-public class LogClass
-{
-    public LogClass(string text,  ELogLevel logLevel = ELogLevel.Info)
-    {
-        LogText = text;
-        LogLevel = logLevel;
-    }
-    public string LogText;
-    public ELogLevel LogLevel;
-}
-
-public enum ELogLevel
-{
-    Info, Warn, Error, SystemInfo
 }
