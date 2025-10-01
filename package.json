@@ -1,5 +1,5 @@
 {
-  "name": "com.GRstory.NetcodePlatform",
+  "name": "com.GRstory.MPPlatform",
   "version": "1.0.0",
   "displayName": "Multiplay Platform",
   "description": "Netcode for Object와 Relay를 사용합니다.",
