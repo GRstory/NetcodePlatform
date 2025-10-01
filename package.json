@@ -1,0 +1,23 @@
+{
+  "name": "com.GRstory.NetcodePlatform",
+  "version": "1.0.0",
+  "displayName": "Multiplay Platform",
+  "description": "Netcode for Object와 Relay를 사용합니다.",
+  "unity": "2022.3",
+  "dependencies": {
+    "com.unity.netcode.gameobjects": "1.12.2",
+    "com.unity.services.relay": "1.2.0"
+  },
+  "keywords": [],
+  "author": {
+    "name": "JunMyeong Kim",
+    "email": "aratino5165@naver.com"
+  },
+  "samples": [
+    {
+      "displayName": "샘플",
+      "description": "샘플임",
+      "path": "Samples~/Reference"
+    }
+  ]
+}
