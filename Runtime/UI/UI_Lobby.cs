@@ -9,16 +9,20 @@ using UnityEngine.UI;
 
 public class UI_Lobby : MonoBehaviour
 {
+    [Header("Main Panel")]
     [SerializeField] private Button _hostButton;
     [SerializeField] private Button _joinButton;
+    [SerializeField] private TMP_InputField _joinCodeField;
+
+    [Header("Select Panel")]
     [SerializeField] private Button _startButton;
     [SerializeField] private GameObject _selectGameModePanel;
-    [SerializeField] private TMP_Text _statusText;
-    [SerializeField] private TMP_InputField _joinCodeField;
-    [SerializeField] private TMP_InputField _nameField;
-    [SerializeField] private Button _changeNameButton;
     [SerializeField] private TMP_Dropdown _gameModeDropdown;
 
+    [Header("Info Panel")]
+    [SerializeField] private TMP_Text _statusText;
+    [SerializeField] private TMP_InputField _nameField;
+    [SerializeField] private Button _changeNameButton;
     [SerializeField] private GameObject _connectedPlayerListObject;
     [SerializeField] private GameObject _connectedPlayerPanelPrefab;
 
