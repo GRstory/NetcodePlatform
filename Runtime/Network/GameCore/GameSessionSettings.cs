@@ -14,6 +14,8 @@ public class GameSessionSettings : NetworkBehaviour
     public string JoinCode = "";
     public bool IsSessionHost = false;
 
+    public List<string> PlayerLameListTest = new List<string>();
+
     private void Awake()
     {
         PlayerDatasInGame = new NetworkList<PlayerData>(
@@ -30,28 +32,9 @@ public class GameSessionSettings : NetworkBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
-    private void Start()
-    {
-        //NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCheck;
-    }
-
-    public override void OnDestroy()
-    {
-        //NetworkManager.Singleton.ConnectionApprovalCallback -= HandleConnectionApprovalCheck;
-        base.OnDestroy();
-    }
-
     public override void OnNetworkSpawn()
     {
-        /*if(Instance != null)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        Instance = this;
-        DontDestroyOnLoad(gameObject);*/
-
-        if(IsServer)
+        if (IsServer)
         {
             NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCheck;
         }

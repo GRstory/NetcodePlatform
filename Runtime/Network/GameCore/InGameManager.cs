@@ -150,11 +150,14 @@ public class InGameManager : SingletonNetwork<InGameManager>
 
     private void HandleClientDisconnected(ulong clientId)
     {
+        if(!IsServer) return;
+
         for (int i = 0; i < GameSessionSettings.Instance.PlayerDatasInGame.Count; i++)
         {
             if (GameSessionSettings.Instance.PlayerDatasInGame[i].ClientId == clientId)
             {
                 GameSessionSettings.Instance.PlayerDatasInGame.RemoveAt(i);
+                AddLog($"Player removed: {clientId}", ELogLevel.SystemInfo);
                 break;
             }
         }
