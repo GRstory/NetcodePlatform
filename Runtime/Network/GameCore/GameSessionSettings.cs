@@ -11,6 +11,8 @@ public class GameSessionSettings : NetworkBehaviour
     public NetworkVariable<bool> IsGameStarted = new NetworkVariable<bool>(false);
     public NetworkList<PlayerData> PlayerDatasInGame { get; private set; }
     public int MaxPlayerCount = 0;
+    public string JoinCode = "";
+    public bool IsSessionHost = false;
 
     private void Awake()
     {
@@ -18,28 +20,52 @@ public class GameSessionSettings : NetworkBehaviour
             null,
             NetworkVariableReadPermission.Everyone,
             NetworkVariableWritePermission.Server);
-    }
 
-    private void Start()
-    {
-        NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCheck;
-    }
-
-    public override void OnDestroy()
-    {
-        NetworkManager.Singleton.ConnectionApprovalCallback -= HandleConnectionApprovalCheck;
-        base.OnDestroy();
-    }
-
-    public override void OnNetworkSpawn()
-    {
-        if(Instance != null)
+        if (Instance != null)
         {
             Destroy(gameObject);
             return;
         }
         Instance = this;
         DontDestroyOnLoad(gameObject);
+    }
+
+    private void Start()
+    {
+        //NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCheck;
+    }
+
+    public override void OnDestroy()
+    {
+        //NetworkManager.Singleton.ConnectionApprovalCallback -= HandleConnectionApprovalCheck;
+        base.OnDestroy();
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        /*if(Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);*/
+
+        if(IsServer)
+        {
+            NetworkManager.Singleton.ConnectionApprovalCallback += HandleConnectionApprovalCheck;
+        }
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        if(IsServer)
+        {
+            if(NetworkManager.Singleton != null)
+            {
+                NetworkManager.Singleton.ConnectionApprovalCallback -= HandleConnectionApprovalCheck;
+            }
+        }
     }
 
     private void HandleConnectionApprovalCheck(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
@@ -58,5 +84,20 @@ public class GameSessionSettings : NetworkBehaviour
         {
             response.Approved = true;
         }
+    }
+
+    public bool TryGetClientIdByNickname(string nickname, out ulong clientId)
+    {
+        foreach (PlayerData playerData in PlayerDatasInGame)
+        {
+            if (playerData.PlayerName == nickname)
+            {
+                clientId = playerData.ClientId;
+                return true;
+            }
+        }
+
+        clientId = ulong.MaxValue;
+        return false;
     }
 }

@@ -1,0 +1,16 @@
+{
+    "name": "NetcodePlatformSamples",
+    "rootNamespace": "",
+    "references": [
+        "GUID:abc6fed153cb73a479667451778bf337"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

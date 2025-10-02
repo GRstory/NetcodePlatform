@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2716929305051063421}
   - component: {fileID: 419930276395820948}
-  - component: {fileID: 969765072428603629}
+  - component: {fileID: 9156221190586778663}
   m_Layer: 0
   m_Name: SampleGameState
   m_TagString: Untagged
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 2644635608
+  GlobalObjectIdHash: 1441145983
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -54,7 +54,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &969765072428603629
+--- !u!114 &9156221190586778663
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -63,7 +63,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7604042306397927405}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 142be270885b38649b09b797dc0ded7b, type: 3}
+  m_Script: {fileID: 11500000, guid: fee754bb24beb004aa86ef3d0514a419, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   CurrentPhase:

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9191518232336290406}
   - component: {fileID: 1316905641575564403}
-  - component: {fileID: 2449715816778709173}
+  - component: {fileID: 7926118395383071980}
   m_Layer: 0
   m_Name: Game Settings
   m_TagString: Untagged
@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1814301830
+  GlobalObjectIdHash: 3927586283
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
@@ -54,7 +54,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &2449715816778709173
+--- !u!114 &7926118395383071980
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -63,10 +63,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5840729492033006962}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d1a3603466803d40a91d1ef3bb71d6e, type: 3}
+  m_Script: {fileID: 11500000, guid: 78ede82929885ab47b6b8086767e8f56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   SelectedGameMode:
     m_InternalValue: 0
   IsGameStarted:
     m_InternalValue: 0
+  MaxPlayerCount: 0

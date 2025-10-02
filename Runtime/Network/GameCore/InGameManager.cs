@@ -12,22 +12,21 @@ using UnityEngine.SceneManagement;
 public class InGameManager : SingletonNetwork<InGameManager>
 {
     public static event Action<List<InGameLog>> OnLogUpdated;
-    public static event Action OnGameReset;
+    public GameModeBase CurrentGameMode { get; private set; }
 
     [Header("Game Settings")]
     [SerializeField] private List<GameModeStruct> _gameModeStructList = new List<GameModeStruct>();
 
     private Dictionary<EGameModeType, Type> _gameModeTypeDict = new Dictionary<EGameModeType, Type>();
-    private GameModeBase _currentGameMode;
     private int _clientsLoadedSceneCount = 0;
     //Log
     private List<InGameLog> _logList = new List<InGameLog>();
 
     private void Update()
     {
-        if (!IsServer || _currentGameMode == null) return;
+        if (!IsServer || CurrentGameMode == null) return;
 
-        _currentGameMode.Tick();
+        CurrentGameMode.Tick();
     }
 
     public override void OnNetworkSpawn()
@@ -41,6 +40,13 @@ public class InGameManager : SingletonNetwork<InGameManager>
         AddLog("InGameManager - OnNetworkSpawn", ELogLevel.SystemInfo);
         InitializeGameMode();
         NetworkManager.Singleton.SceneManager.OnLoadEventCompleted += OnLoadEventCompleted;
+        NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= OnLoadEventCompleted;
+        NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnected;
     }
 
     private void OnLoadEventCompleted(string sceneName, UnityEngine.SceneManagement.LoadSceneMode loadSceneMode, List<ulong> clientsCompleted, List<ulong> clientsTimedOut)
@@ -54,7 +60,7 @@ public class InGameManager : SingletonNetwork<InGameManager>
         {
             NetworkManager.Singleton.SceneManager.OnLoadEventCompleted -= OnLoadEventCompleted;
 
-            _currentGameMode.SpawnAllPlayers();
+            CurrentGameMode.SpawnAllPlayers();
         }
     }
 
@@ -87,9 +93,9 @@ public class InGameManager : SingletonNetwork<InGameManager>
             GameStateBase gameStateInstance = Instantiate(gameStatePrefab).GetComponent<GameStateBase>();
             gameStateInstance.GetComponent<NetworkObject>().Spawn();
 
-            _currentGameMode = GetGameMode(gameModeType, gameStateInstance);
-            _currentGameMode.Initialize(gameStateInstance);
-            AddLog($"InGameManager - Current GameMode: {_currentGameMode}", ELogLevel.SystemInfo);
+            CurrentGameMode = GetGameMode(gameModeType, gameStateInstance);
+            CurrentGameMode.Initialize(gameStateInstance);
+            AddLog($"InGameManager - Current GameMode: {CurrentGameMode}", ELogLevel.SystemInfo);
             AddLog($"InGameManager - Create GameState", ELogLevel.SystemInfo);
         }
     }
@@ -111,19 +117,47 @@ public class InGameManager : SingletonNetwork<InGameManager>
 
     public void ExitGame()
     {
-        NetworkManager.Singleton.Shutdown();
-        SceneManager.LoadScene("Lobby");
+        if(IsServer)
+        {
+            CurrentGameMode.DespawnAllPlayers();
+            GameSessionSettings.Instance.IsGameStarted.Value = false;
+            GameStateBase.Instance.gameObject.GetComponent<NetworkObject>().Despawn();
+            NetworkManager.Singleton.SceneManager.LoadScene("Lobby", UnityEngine.SceneManagement.LoadSceneMode.Single);
+        }
+        else if(IsClient)
+        {
+            NetworkManager.Singleton.Shutdown();
+            SceneManager.LoadScene("Lobby");
+        }
     }
 
     public void RequestReplay()
     {
         if (!IsServer) return;
 
-        if(_currentGameMode != null)
+        if(CurrentGameMode != null)
         {
-            _currentGameMode.ResetGame();
+            CurrentGameMode.DespawnAllPlayers();
         }
-        OnGameReset?.Invoke();
+        //다른 네트워크 오브젝트 싹다 삭제
+
+        //게임스테이트 삭제
+        GameStateBase.Instance.GetComponent<NetworkObject>().Despawn();
+
+        //씬 재로딩
+        NetworkManager.Singleton.SceneManager.LoadScene(SceneManager.GetActiveScene().name, LoadSceneMode.Single);
+    }
+
+    private void HandleClientDisconnected(ulong clientId)
+    {
+        for (int i = 0; i < GameSessionSettings.Instance.PlayerDatasInGame.Count; i++)
+        {
+            if (GameSessionSettings.Instance.PlayerDatasInGame[i].ClientId == clientId)
+            {
+                GameSessionSettings.Instance.PlayerDatasInGame.RemoveAt(i);
+                break;
+            }
+        }
     }
 
     #region Log System

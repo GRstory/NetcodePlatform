@@ -1,16 +1,17 @@
 using System;
 using System.Threading.Tasks;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
-using Unity.Collections;
 using UnityEngine;
 
 public class LobbyManager : SingletonNetwork<LobbyManager>
 {
+    [SerializeField] private GameObject _gameSessionSettingsPrefab;
     public NetworkList<PlayerData> PlayerDataList { get; private set; }
     public int CurrentPlayerCount => PlayerDataList.Count;
 
@@ -45,34 +46,35 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         {
             OnLobbyStateChanged?.Invoke(ELobbyState.Error, "Unity 서비스 초기화 실패.");
         }
-
-        NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect_OnClient;
-        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected_OnClient;
-    }
-
-    public override void OnDestroy()
-    {
-        if (NetworkManager.Singleton != null)
-        {
-            NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect_OnClient;
-            NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected_OnClient;
-        }
-
-        base.OnDestroy();
     }
 
     #region NetworkBehaviour
     public override void OnNetworkSpawn()
     {
+        bool isReturningFromGame = false;
+        if (GameSessionSettings.Instance != null && GameSessionSettings.Instance.PlayerDatasInGame.Count > 0)
+        {
+            isReturningFromGame = true;
+        }
+
         if(IsServer)
         {
+            if(isReturningFromGame)
+            {
+                RestorePlayerListFromSession();
+                OnLobbyStateChanged?.Invoke(ELobbyState.HostSuccess, GameSessionSettings.Instance.JoinCode);
+            }
             NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
             NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnected;
         }
-        if(IsClient)
+        if(IsClient && !IsServer)
         {
-            //NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect_OnClient;
-            //NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected_OnClient;
+            if (isReturningFromGame)
+            {
+                OnLobbyStateChanged?.Invoke(ELobbyState.ClientSuccess, "Returned to Lobby");
+            }
+            NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect_OnClient;
+            NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected_OnClient;
         }
     }
 
@@ -85,8 +87,8 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         }
         if (IsClient)
         {
-            //NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect_OnClient;
-            //NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected_OnClient;
+            NetworkManager.Singleton.OnClientDisconnectCallback -= HandleClientDisconnect_OnClient;
+            NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected_OnClient;
         }
     }
     #endregion
@@ -120,6 +122,7 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         {
             Allocation allocation = await RelayService.Instance.CreateAllocationAsync(MaxPlayer);
             string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+            GUIUtility.systemCopyBuffer = joinCode;
 
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetHostRelayData(
                 allocation.RelayServer.IpV4,
@@ -132,7 +135,14 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
             if(PlayerDataList.Count > 0) PlayerDataList.Clear();
 
             NetworkManager.Singleton.StartHost();
-            GameSessionSettings.Instance.MaxPlayerCount = MaxPlayer;
+
+            GameObject gssObject = GameObject.Instantiate(_gameSessionSettingsPrefab);
+            GameSessionSettings gss = gssObject.GetComponent<GameSessionSettings>();
+            gss.MaxPlayerCount = MaxPlayer;
+            gss.JoinCode = joinCode;
+            gss.IsSessionHost = true;
+            gssObject.GetComponent<NetworkObject>().Spawn();
+
             OnLobbyStateChanged?.Invoke(ELobbyState.HostSuccess, joinCode);
         }
         catch (Exception e)
@@ -200,34 +210,60 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
     public void ShutdownLobby()
     {
         if(!IsServer) return;
+        Debug.Log("ShutdownLobby");
 
         NetworkManager.Singleton.Shutdown();
+        PlayerDataList.Clear();
         OnLobbyStateChanged?.Invoke(ELobbyState.Idle, "Lobby was shutdowned");
     }
 
     public void LeaveLobby()
     {
         if (!IsClient || IsHost) return;
+        Debug.Log("LeaveLobby");
         NetworkManager.Singleton.Shutdown();
     }
 
     public void SetPlayerName(string name)
     {
+        Debug.Log("SetPlayerName");
         _playerNameCache = name;
         SetNicknameServerRpc(name);
+    }
+
+    private void RestorePlayerListFromSession()
+    {
+        Debug.Log("RestorePlayerListFromSession");
+        PlayerDataList.Clear();
+        foreach (PlayerData data in GameSessionSettings.Instance.PlayerDatasInGame)
+        {
+            PlayerDataList.Add(data);
+        }
+
+        if(IsServer)
+        {
+            OnLobbyStateChanged?.Invoke(ELobbyState.HostSuccess, GameSessionSettings.Instance.JoinCode);
+        }
+        else if(IsClient)
+        {
+            OnLobbyStateChanged?.Invoke(ELobbyState.ClientSuccess, "Lobby Reconnected");
+        }
+        GameSessionSettings.Instance.PlayerDatasInGame.Clear();
     }
     #endregion
 
     #region Handler
     private void HandleClientConnected(ulong clientId)
     {
+        Debug.Log("HandleClientConnected");
         PlayerDataList.Add(new PlayerData { ClientId = clientId, PlayerName = $"Player{clientId}" });
     }
 
     private void HandleClientConnected_OnClient(ulong clientId)
     {
+        Debug.Log("HandleClientConnected_OnClient");
         //미리 지정된 이름으로 변경
-        if(clientId == NetworkManager.Singleton.LocalClientId)
+        if (clientId == NetworkManager.Singleton.LocalClientId)
         {
             OnLobbyStateChanged?.Invoke(ELobbyState.ClientSuccess, "connected");
             SetPlayerName(_playerNameCache);
@@ -236,7 +272,8 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
 
     private void HandleClientDisconnected(ulong clientId)
     {
-        for(int i = 0; i < PlayerDataList.Count; i++)
+        Debug.Log("HandleClientDisconnected");
+        for (int i = 0; i < PlayerDataList.Count; i++)
         {
             if( PlayerDataList[i].ClientId == clientId )
             {
@@ -248,6 +285,7 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
 
     private void HandleClientDisconnect_OnClient(ulong clientId)
     {
+        Debug.Log("HandleClientDisconnect_OnClient");
         if (clientId != NetworkManager.Singleton.LocalClientId) return;
 
         if (_isKicked)
@@ -256,7 +294,6 @@ public class LobbyManager : SingletonNetwork<LobbyManager>
         }
         else
         {
-            //OnLobbyStateChanged?.Invoke(ELobbyState.Idle, NetworkManager.Singleton.DisconnectReason);
             OnLobbyStateChanged?.Invoke(ELobbyState.Idle, "Lobby is full or unavailable");
         }
 

@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3704339166092253744}
   - component: {fileID: 3905521699157045297}
-  - component: {fileID: 8424980116721393968}
+  - component: {fileID: 6291028970657828055}
   m_Layer: 0
   m_Name: Lobby Manager
   m_TagString: Untagged
@@ -45,8 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3490798986
-  InScenePlacedSourceGlobalObjectIdHash: 0
+  GlobalObjectIdHash: 362900902
+  InScenePlacedSourceGlobalObjectIdHash: 1493465729
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 0
   ActiveSceneSynchronization: 0
@@ -54,7 +54,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &8424980116721393968
+--- !u!114 &6291028970657828055
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -63,7 +63,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4286014485411227965}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a289b8785308d214aac1257332b1cdca, type: 3}
+  m_Script: {fileID: 11500000, guid: d8d7488768e547b449776413d7eabe55, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _gameSessionSettingsPrefab: {fileID: 5840729492033006962, guid: 2ec4622d96c89cb489b24fcad52b85d1,
+    type: 3}
   MaxPlayer: 4

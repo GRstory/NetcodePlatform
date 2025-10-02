@@ -53,6 +53,19 @@ public class UI_Lobby : MonoBehaviour
             connectedPlayer.UpdateDisplay(new PlayerData());
             _connectedPlayerList.Add(connectedPlayer);
         }
+
+        RedrawPlayerList(false);
+        if(GameSessionSettings.Instance != null)
+        {
+            if (GameSessionSettings.Instance != null && GameSessionSettings.Instance.IsHost)
+            {
+                HandleLobbyStateChanged(ELobbyState.HostSuccess, GameSessionSettings.Instance.JoinCode);
+            }
+            else
+            {
+                HandleLobbyStateChanged(ELobbyState.ClientSuccess, "");
+            }
+        }
     }
 
     private void HandleLobbyStateChanged(ELobbyState state, string reason)
@@ -65,10 +78,7 @@ public class UI_Lobby : MonoBehaviour
                 _hostButton.interactable = true;
                 _joinButton.interactable = true;
                 _selectGameModePanel.SetActive(false);
-                for (int i = 0; i < _connectedPlayerList.Count; i++)
-                {
-                    _connectedPlayerList[i].UpdateDisplay(new PlayerData());
-                }
+                RedrawPlayerList(true);
                 break;
             case ELobbyState.Connecting:
                 _hostButton.interactable = false;
@@ -84,6 +94,7 @@ public class UI_Lobby : MonoBehaviour
                 _hostButton.interactable = false;
                 _joinButton.interactable = false;
                 _selectGameModePanel.SetActive(false);
+                RedrawPlayerList(false);
                 break;
             case ELobbyState.Error:
                 _hostButton.interactable = true;
@@ -101,17 +112,7 @@ public class UI_Lobby : MonoBehaviour
 
     private void HandlePlayerListChanged(NetworkListEvent<PlayerData> changeEvent)
     {
-        int cnt = Math.Min(_connectedPlayerList.Count, LobbyManager.Instance.PlayerDataList.Count);
-        for (int i = 0; i < cnt; i++)
-        {
-            _connectedPlayerList[i].UpdateDisplay(LobbyManager.Instance.PlayerDataList[i]);
-            //Debug.Log($"{i}: {LobbyManager.Instance.PlayerDataList[i].PlayerName}");
-        }
-        for(int i = cnt; i < _connectedPlayerList.Count; i++)
-        {
-            _connectedPlayerList[i].UpdateDisplay(new PlayerData());
-            //Debug.Log($"{i}: null");
-        }
+        RedrawPlayerList(false);
     }
 
     private void HandleSetPlayerNameChanged()
@@ -123,8 +124,21 @@ public class UI_Lobby : MonoBehaviour
         }
     }
 
-    private void HandleTest()
+    private void RedrawPlayerList(bool reset)
     {
+        int connectedPlayerCount = LobbyManager.Instance.PlayerDataList.Count;
 
+        for (int i = 0; i < _connectedPlayerList.Count; i++)
+        {
+            if (i < connectedPlayerCount)
+            {
+                if(reset) _connectedPlayerList[i].UpdateDisplay(new PlayerData());
+                else _connectedPlayerList[i].UpdateDisplay(LobbyManager.Instance.PlayerDataList[i]);
+            }
+            else
+            {
+                _connectedPlayerList[i].UpdateDisplay(new PlayerData());
+            }
+        }
     }
 }

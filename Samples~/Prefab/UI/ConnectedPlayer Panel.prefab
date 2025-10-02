@@ -268,7 +268,7 @@ GameObject:
   - component: {fileID: 8433579409464704757}
   - component: {fileID: 4207547914080493318}
   - component: {fileID: 3433411758094334042}
-  - component: {fileID: 799112639173228285}
+  - component: {fileID: 6559016780513257000}
   m_Layer: 5
   m_Name: ConnectedPlayer Panel
   m_TagString: Untagged
@@ -295,7 +295,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 200, y: -45}
-  m_SizeDelta: {x: 360, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4442308372025583245
 CanvasRenderer:
@@ -375,7 +375,7 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!114 &799112639173228285
+--- !u!114 &6559016780513257000
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -384,7 +384,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 4178982419205644436}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a66074edafac21044b7d9f9c3fc00b0d, type: 3}
+  m_Script: {fileID: 11500000, guid: a915d0977cc06694aaf83136b08bf05c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   _nameText: {fileID: 164530147143049588}

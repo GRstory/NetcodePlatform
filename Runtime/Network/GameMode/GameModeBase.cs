@@ -36,6 +36,7 @@ public abstract class GameModeBase
         }
     }
 
+    #region Tick
     protected abstract void TickWaitingForPlayers();
     protected virtual void TickCountdown()
     {
@@ -48,6 +49,7 @@ public abstract class GameModeBase
     }
     protected abstract void TickInProgress();
     protected abstract void TickRoundOver();
+    #endregion
 
     public virtual void OnAllPlayerSpawned()
     {
@@ -56,42 +58,78 @@ public abstract class GameModeBase
         _gameState.CountdownTimer.Value = _countdownDuration;
     }
 
-    public abstract void OnPlayerKilled(ulong playerId);
-    public abstract void RequestRespawn();
-    public void ResetGame()
-    {
-        RespawnAllPlayers();
-    }
+    public abstract void KillPlayer(ulong vimtimId);
+    public abstract void KillPlayer(ulong victimId, ulong killerId);
 
     public virtual void SpawnAllPlayers()
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            InGameManager.Instance.AddLog($"GameMode - SpawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
             SpawnPlayer(clientId);
         }
 
         OnAllPlayerSpawned();
     }
 
-    public virtual void RespawnAllPlayers()
+    public virtual void DespawnAllPlayers()
     {
         if (!NetworkManager.Singleton.IsServer) return;
-        InGameManager.Instance.AddLog($"GameMode - RspawnAllPlayer", ELogLevel.SystemInfo);
 
-        foreach (var client in NetworkManager.Singleton.ConnectedClients.Values)
+        foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
-            if (client.PlayerObject != null)
-            {
-                client.PlayerObject.Despawn(true);
-            }
+            DespawnPlayer(clientId);
         }
-
-        SpawnAllPlayers();
     }
 
-    protected abstract void SpawnPlayer(ulong clientId);
-    protected abstract void RespawnPlayer(ulong clientId);
+    protected virtual void SpawnPlayer(ulong clientId)
+    {
+        //플레이어 스폰
+        GameModeStruct currentGameModeStruct = InGameManager.Instance.GetGameModeStruct();
+
+        if (currentGameModeStruct.PlayerPrefab == null)
+        {
+            Debug.LogError($"PlayerPrefab for GameMode '{currentGameModeStruct.GameModeType}' is not assigned in the ServerGameManager.");
+            return;
+        }
+        GameObject playerPrefab = currentGameModeStruct.PlayerPrefab;
+
+        Vector3 spawnPos = Vector3.zero;
+        GameObject playerInstance = GameObject.Instantiate(playerPrefab, spawnPos, Quaternion.identity);
+        NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
+        networkObject.SpawnAsPlayerObject(clientId);
+
+        //플레이어 설정
+        FixedString32Bytes playerName = $"Player {clientId}";
+        foreach (var playerData in GameSessionSettings.Instance.PlayerDatasInGame)
+        {
+            if (playerData.ClientId == clientId)
+            {
+                playerName = playerData.PlayerName;
+                break;
+            }
+        }
+        if (playerInstance.TryGetComponent<SamplePlayerController>(out SamplePlayerController samplePlayerController))
+        {
+            samplePlayerController.PlayerName.Value = playerName;
+        }
+        InGameManager.Instance.AddLog($"GameMode - SpawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
+    }
+
+    protected void DespawnPlayer(ulong clientId)
+    {
+        if (!NetworkManager.Singleton.IsServer) return;
+
+        if (NetworkManager.Singleton.ConnectedClients.TryGetValue(clientId, out NetworkClient networkClient))
+        {
+            if (networkClient.PlayerObject != null)
+            {
+                networkClient.PlayerObject.Despawn(true);
+                InGameManager.Instance.AddLog($"GameMode - DespawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
+                return;
+            }
+        }
+        InGameManager.Instance.AddLog($"GameMode - Cant DespawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
+    }
 }
 
 [AttributeUsage(AttributeTargets.Class)]

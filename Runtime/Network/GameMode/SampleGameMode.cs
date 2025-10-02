@@ -12,15 +12,6 @@ public class SampleGameMode : GameModeBase
     private float _runningDuration = 30f;
     private float _currentRunningTime = 0f;
 
-    public override void OnPlayerKilled(ulong playerId)
-    {
-        
-    }
-
-    public override void RequestRespawn()
-    {
-        
-    }
 
     protected override void TickInProgress()
     {
@@ -54,41 +45,14 @@ public class SampleGameMode : GameModeBase
         }
     }
 
-    public override void ResetGame()
-    {
 
+    public override void KillPlayer(ulong victimId)
+    {
+        InGameManager.Instance.AddLog($"Gamemode - KillPlayer: Client{victimId}");
     }
 
-    protected override void SpawnPlayer(ulong clientId)
+    public override void KillPlayer(ulong victimId, ulong killerId)
     {
-        //플레이어 스폰
-        GameModeStruct currentGameModeStruct = InGameManager.Instance.GetGameModeStruct();
-
-        if (currentGameModeStruct.PlayerPrefab == null)
-        {
-            Debug.LogError($"PlayerPrefab for GameMode '{currentGameModeStruct.GameModeType}' is not assigned in the ServerGameManager.");
-            return;
-        }
-        GameObject playerPrefab = currentGameModeStruct.PlayerPrefab;
-
-        Vector3 spawnPos = Vector3.zero;
-        GameObject playerInstance = GameObject.Instantiate(playerPrefab, spawnPos, Quaternion.identity);
-        NetworkObject networkObject = playerInstance.GetComponent<NetworkObject>();
-        networkObject.SpawnAsPlayerObject(clientId);
-
-        //플레이어 설정
-        FixedString32Bytes playerName = $"Player {clientId}";
-        foreach (var playerData in GameSessionSettings.Instance.PlayerDatasInGame)
-        {
-            if (playerData.ClientId == clientId)
-            {
-                playerName = playerData.PlayerName;
-                break;
-            }
-        }
-        if (playerInstance.TryGetComponent<SamplePlayerController>(out SamplePlayerController samplePlayerController))
-        {
-            samplePlayerController.PlayerName.Value = playerName;
-        }
+        InGameManager.Instance.AddLog($"Gamemode - KillPlayer: Client{killerId} kill Client{victimId}");
     }
 }
