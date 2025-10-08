@@ -10,7 +10,7 @@ using UnityEngine.SceneManagement;
 public class InGameManager : SingletonNetwork<InGameManager>
 {
     public static event Action<List<InGameLog>> OnLogUpdated;
-    public GameModeBase CurrentGameMode { get; private set; }
+    public IGameMode CurrentGameMode { get; private set; }
 
     [Header("Game Settings")]
     [SerializeField] private List<GameModeStruct> _gameModeStructList = new List<GameModeStruct>();
@@ -66,7 +66,7 @@ public class InGameManager : SingletonNetwork<InGameManager>
     {
         //게임모드클래스 딕셔너리 설정
         var gameModeClassList = Assembly.GetExecutingAssembly().GetTypes()
-            .Where(t => t.IsSubclassOf(typeof(GameModeBase)) && !t.IsAbstract);
+            .Where(t => t.IsSubclassOf(typeof(IGameMode)) && !t.IsAbstract);
         foreach (var gameModeClass in gameModeClassList)
         {
             var attribute = gameModeClass.GetCustomAttribute<GameModeTypeAttribute>();
@@ -98,11 +98,11 @@ public class InGameManager : SingletonNetwork<InGameManager>
         }
     }
 
-    private GameModeBase GetGameMode(EGameModeType gameModeType, GameStateBase gameState)
+    private IGameMode GetGameMode(EGameModeType gameModeType, GameStateBase gameState)
     {
         if (_gameModeTypeDict.TryGetValue(gameModeType, out Type value))
         {
-            return (GameModeBase)Activator.CreateInstance(value, gameState);
+            return (IGameMode)Activator.CreateInstance(value, gameState);
         }
         return null;
     }

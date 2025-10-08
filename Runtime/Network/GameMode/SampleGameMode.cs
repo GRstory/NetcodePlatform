@@ -6,14 +6,13 @@ using Unity.Netcode;
 using UnityEngine;
 
 [GameModeType(EGameModeType.Sample)]
-public class SampleGameMode : GameModeBase
+public class SampleGameMode : GameModeBase<SampleGameState>
 {
     private bool _isLoggedPlayerData = false;
     private float _runningDuration = 30f;
     private float _currentRunningTime = 0f;
 
-
-    protected override void TickInProgress()
+    public override void TickInProgress()
     {
         _currentRunningTime += Time.deltaTime;
         if(_runningDuration < _currentRunningTime)
@@ -22,17 +21,17 @@ public class SampleGameMode : GameModeBase
         }
     }
 
-    protected override void TickRoundOver()
+    public override void TickRoundOver()
     {
         
     }
 
-    protected override void TickWaitingForPlayers()
+    public override void TickWaitingForPlayers()
     {
         
     }
 
-    protected override void TickCountdown()
+    public override void TickCountdown()
     {
         base.TickCountdown();
         if(!_isLoggedPlayerData)
