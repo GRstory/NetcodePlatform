@@ -4,7 +4,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [GameModeType(EGameModeType.Default)]
-public abstract class GameModeBase<TGameState, TScore> : IGameMode<TScore> where TGameState : GameStateBase where TScore : struct
+public abstract class GameModeBase<TGameState> : IGameMode where TGameState : GameStateBase
 {
     protected TGameState _gameState;
     protected float _countdownDuration = 3f;
@@ -144,10 +144,8 @@ public abstract class GameModeBase<TGameState, TScore> : IGameMode<TScore> where
     #endregion
 
     #region Score
-    public abstract void PlayerGetScore(ulong clientId, TScore score);
-    }
+    public abstract void PlayerGetScore<TScore>(ulong clientId, TScore score);
     #endregion
-
 }
 
 [AttributeUsage(AttributeTargets.Class)]

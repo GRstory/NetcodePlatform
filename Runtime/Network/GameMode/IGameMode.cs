@@ -2,7 +2,7 @@ using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
-public interface IGameMode<TScore> where TScore : struct
+public interface IGameMode
 {
     public void Initialize(GameStateBase gameState);
     void Tick();
@@ -21,5 +21,5 @@ public interface IGameMode<TScore> where TScore : struct
 
     void KillPlayer(ulong vimtimId);
     void KillPlayer(ulong victimId, ulong killerId);
-    void PlayerGetScore(ulong clientId, TScore score);
+    void PlayerGetScore<TScore>(ulong clientId, TScore score);
 }
