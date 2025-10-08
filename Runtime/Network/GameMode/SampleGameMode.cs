@@ -55,4 +55,9 @@ public class SampleGameMode : GameModeBase
     {
         InGameManager.Instance.AddLog($"Gamemode - KillPlayer: Client{killerId} kill Client{victimId}");
     }
+
+    public override void PlayerGetScore<T>(ulong clientId, T score)
+    {
+        
+    }
 }

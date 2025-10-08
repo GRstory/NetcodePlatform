@@ -53,15 +53,25 @@ public abstract class GameModeBase
 
     public virtual void OnAllPlayerSpawned()
     {
-        InGameManager.Instance.AddLog($"GameMode - AllPlayerSpawed", ELogLevel.SystemInfo);
+        InGameManager.Instance.AddLog($"GameMode - AllPlayerSpawned", ELogLevel.SystemInfo);
         _gameState.CurrentPhase.Value = EGamePhase.Countdown;
         _gameState.CountdownTimer.Value = _countdownDuration;
     }
 
+    public virtual void OnAllPlayerDespawned()
+    {
+        InGameManager.Instance.AddLog($"GameMode - AllPlayerDespawned", ELogLevel.SystemInfo);
+        _gameState.CurrentPhase.Value = EGamePhase.WaitingForPlayers;
+    }
+
+
+    #region Kill
     public abstract void KillPlayer(ulong vimtimId);
     public abstract void KillPlayer(ulong victimId, ulong killerId);
+    #endregion
 
-    public virtual void SpawnAllPlayers()
+    #region Spawn/Despawn
+    public void SpawnAllPlayers()
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
@@ -71,7 +81,7 @@ public abstract class GameModeBase
         OnAllPlayerSpawned();
     }
 
-    public virtual void DespawnAllPlayers()
+    public void DespawnAllPlayers()
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
@@ -79,9 +89,11 @@ public abstract class GameModeBase
         {
             DespawnPlayer(clientId);
         }
+
+        OnAllPlayerDespawned();
     }
 
-    protected virtual void SpawnPlayer(ulong clientId)
+    protected void SpawnPlayer(ulong clientId)
     {
         //플레이어 스폰
         GameModeStruct currentGameModeStruct = InGameManager.Instance.GetGameModeStruct();
@@ -130,6 +142,10 @@ public abstract class GameModeBase
         }
         InGameManager.Instance.AddLog($"GameMode - Cant DespawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
     }
+    #endregion
+
+    public abstract void PlayerGetScore<T>(ulong clientId, T score);
+
 }
 
 [AttributeUsage(AttributeTargets.Class)]
