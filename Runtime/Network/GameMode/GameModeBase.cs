@@ -129,7 +129,7 @@ public abstract class GameModeBase<TGameState> : IGameMode where TGameState : Ga
         InGameManager.Instance.AddLog($"GameMode - Cant DespawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
     }
 
-    public void OnAllPlayerSpawned()
+    public virtual void OnAllPlayerSpawned()
     {
         InGameManager.Instance.AddLog($"GameMode - AllPlayerSpawned", ELogLevel.SystemInfo);
         _gameState.CurrentPhase.Value = EGamePhase.Countdown;
