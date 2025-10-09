@@ -1,6 +1,6 @@
 {
   "name": "com.grstory.netcode_platform",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "displayName": "Multiplay Netcode Platform",
   "description": "Netcode for Object\uc640 Relay\ub97c \uc0ac\uc6a9\ud569\ub2c8\ub2e4.",
   "unity": "2022.3",
