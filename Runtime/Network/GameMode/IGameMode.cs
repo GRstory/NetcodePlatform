@@ -19,7 +19,7 @@ public interface IGameMode
     void OnAllPlayerSpawned();
     void OnAllPlayerDespawned();
 
-    void KillPlayer(ulong vimtimId);
-    void KillPlayer(ulong victimId, ulong killerId);
+    void KillPlayer(ulong vimtimId, EDeathReason reason);
+    void KillPlayer(ulong victimId, ulong killerId, EDeathReason reason);
     void PlayerGetScore<TScore>(ulong clientId, TScore score);
 }

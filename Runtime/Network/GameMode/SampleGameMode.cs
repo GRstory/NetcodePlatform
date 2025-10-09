@@ -45,12 +45,12 @@ public class SampleGameMode : GameModeBase<SampleGameState>
     }
 
 
-    public override void KillPlayer(ulong victimId)
+    public override void KillPlayer(ulong victimId, EDeathReason reason)
     {
         InGameManager.Instance.AddLog($"Gamemode - KillPlayer: Client{victimId}");
     }
 
-    public override void KillPlayer(ulong victimId, ulong killerId)
+    public override void KillPlayer(ulong victimId, ulong killerId, EDeathReason reason)
     {
         InGameManager.Instance.AddLog($"Gamemode - KillPlayer: Client{killerId} kill Client{victimId}");
     }

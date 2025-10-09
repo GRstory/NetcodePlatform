@@ -11,12 +11,12 @@ public class ConsoleCommandKill : ConsoleCommandSO
         {
             if (GameSessionSettings.Instance.TryGetClientIdByNickname(args[0], out ulong clientId))
             {
-                InGameManager.Instance.CurrentGameMode.KillPlayer(clientId);
+                InGameManager.Instance.CurrentGameMode.KillPlayer(clientId, EDeathReason.None);
                 return true;
             }
             else if(ulong.TryParse(args[0],out ulong clientId2))
             {
-                InGameManager.Instance.CurrentGameMode.KillPlayer(clientId2);
+                InGameManager.Instance.CurrentGameMode.KillPlayer(clientId2, EDeathReason.None);
                 return true;
             }
         }
@@ -27,7 +27,7 @@ public class ConsoleCommandKill : ConsoleCommandSO
 
             if (victimFound && attackerFound)
             {
-                InGameManager.Instance.CurrentGameMode.KillPlayer(victimId, attackerId);
+                InGameManager.Instance.CurrentGameMode.KillPlayer(victimId, attackerId, EDeathReason.None);
                 return true;
             }
             else
@@ -42,7 +42,7 @@ public class ConsoleCommandKill : ConsoleCommandSO
                 }
                 if (victimFound && attackerFound)
                 {
-                    InGameManager.Instance.CurrentGameMode.KillPlayer(victimId, attackerId);
+                    InGameManager.Instance.CurrentGameMode.KillPlayer(victimId, attackerId, EDeathReason.None);
                     return true;
                 }
             }

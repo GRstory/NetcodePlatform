@@ -52,8 +52,8 @@ public abstract class GameModeBase<TGameState> : IGameMode where TGameState : Ga
     #endregion
 
     #region Kill
-    public abstract void KillPlayer(ulong vimtimId);
-    public abstract void KillPlayer(ulong victimId, ulong killerId);
+    public abstract void KillPlayer(ulong vimtimId, EDeathReason reason);
+    public abstract void KillPlayer(ulong victimId, ulong killerId, EDeathReason reason);
     #endregion
 
     #region Spawn/Despawn
