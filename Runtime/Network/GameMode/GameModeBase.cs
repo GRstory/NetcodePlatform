@@ -52,7 +52,7 @@ public abstract class GameModeBase<TGameState> : IGameMode where TGameState : Ga
     #endregion
 
     #region Spawn/Despawn
-    public void SpawnAllPlayers()
+    public virtual void SpawnAllPlayers()
     {
         foreach (ulong clientId in NetworkManager.Singleton.ConnectedClientsIds)
         {
@@ -62,7 +62,7 @@ public abstract class GameModeBase<TGameState> : IGameMode where TGameState : Ga
         OnAllPlayerSpawned();
     }
 
-    public void DespawnAllPlayers()
+    public virtual void DespawnAllPlayers()
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
@@ -74,7 +74,7 @@ public abstract class GameModeBase<TGameState> : IGameMode where TGameState : Ga
         OnAllPlayerDespawned();
     }
 
-    public void SpawnPlayer(ulong clientId)
+    public virtual void SpawnPlayer(ulong clientId)
     {
         //플레이어 스폰
         GameModeStruct currentGameModeStruct = InGameManager.Instance.GetGameModeStruct();
@@ -108,7 +108,7 @@ public abstract class GameModeBase<TGameState> : IGameMode where TGameState : Ga
         InGameManager.Instance.AddLog($"GameMode - SpawnPlayer(Client: {clientId})", ELogLevel.SystemInfo);
     }
 
-    public void DespawnPlayer(ulong clientId)
+    public virtual void DespawnPlayer(ulong clientId)
     {
         if (!NetworkManager.Singleton.IsServer) return;
 
