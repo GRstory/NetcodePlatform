@@ -51,11 +51,6 @@ public abstract class GameModeBase<TGameState> : IGameMode where TGameState : Ga
     public abstract void TickRoundOver();
     #endregion
 
-    #region Kill
-    public abstract void KillPlayer(ulong vimtimId, EDeathReason reason);
-    public abstract void KillPlayer(ulong victimId, ulong killerId, EDeathReason reason);
-    #endregion
-
     #region Spawn/Despawn
     public void SpawnAllPlayers()
     {
@@ -141,10 +136,6 @@ public abstract class GameModeBase<TGameState> : IGameMode where TGameState : Ga
         InGameManager.Instance.AddLog($"GameMode - AllPlayerDespawned", ELogLevel.SystemInfo);
         _gameState.CurrentPhase.Value = EGamePhase.WaitingForPlayers;
     }
-    #endregion
-
-    #region Score
-    public abstract void PlayerGetScore<TScore>(ulong clientId, TScore score);
     #endregion
 }
 

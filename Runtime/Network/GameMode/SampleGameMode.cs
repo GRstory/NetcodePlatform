@@ -6,7 +6,7 @@ using Unity.Netcode;
 using UnityEngine;
 
 [GameModeType(EGameModeType.Sample)]
-public class SampleGameMode : GameModeBase<SampleGameState>
+public class SampleGameMode : GameModeBase<SampleGameState>, IGMProgress<float>, IGMKill<EDeathReason>
 {
     private bool _isLoggedPlayerData = false;
     private float _runningDuration = 30f;
@@ -45,17 +45,17 @@ public class SampleGameMode : GameModeBase<SampleGameState>
     }
 
 
-    public override void KillPlayer(ulong victimId, EDeathReason reason)
+    public void KillPlayer(ulong victimId, EDeathReason reason)
     {
         InGameManager.Instance.AddLog($"Gamemode - KillPlayer: Client{victimId}");
     }
 
-    public override void KillPlayer(ulong victimId, ulong killerId, EDeathReason reason)
+    public void KillPlayer(ulong victimId, ulong killerId, EDeathReason reason)
     {
         InGameManager.Instance.AddLog($"Gamemode - KillPlayer: Client{killerId} kill Client{victimId}");
     }
 
-    public override void PlayerGetScore<TScore>(ulong clientId, TScore score)
+    public void PlayerGetScore(ulong clientId, float score)
     {
         
     }

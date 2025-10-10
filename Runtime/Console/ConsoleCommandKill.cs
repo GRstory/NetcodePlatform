@@ -1,5 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEditor.PackageManager;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "Kill Command", menuName = "Console Commands/Kill Command")]
@@ -11,12 +14,14 @@ public class ConsoleCommandKill : ConsoleCommandSO
         {
             if (GameSessionSettings.Instance.TryGetClientIdByNickname(args[0], out ulong clientId))
             {
-                InGameManager.Instance.CurrentGameMode.KillPlayer(clientId, EDeathReason.None);
+                IGMKill<EDeathReason> gmKill = InGameManager.Instance.CurrentGameMode as IGMKill<EDeathReason>;
+                gmKill.KillPlayer(clientId, 0);
                 return true;
             }
             else if(ulong.TryParse(args[0],out ulong clientId2))
             {
-                InGameManager.Instance.CurrentGameMode.KillPlayer(clientId2, EDeathReason.None);
+                IGMKill<EDeathReason> gmKill = InGameManager.Instance.CurrentGameMode as IGMKill<EDeathReason>;
+                gmKill.KillPlayer(clientId, 0);
                 return true;
             }
         }
@@ -27,7 +32,8 @@ public class ConsoleCommandKill : ConsoleCommandSO
 
             if (victimFound && attackerFound)
             {
-                InGameManager.Instance.CurrentGameMode.KillPlayer(victimId, attackerId, EDeathReason.None);
+                IGMKill<EDeathReason> gmKill = InGameManager.Instance.CurrentGameMode as IGMKill<EDeathReason>;
+                gmKill.KillPlayer(victimId, attackerId, 0);
                 return true;
             }
             else
@@ -42,7 +48,8 @@ public class ConsoleCommandKill : ConsoleCommandSO
                 }
                 if (victimFound && attackerFound)
                 {
-                    InGameManager.Instance.CurrentGameMode.KillPlayer(victimId, attackerId, EDeathReason.None);
+                    IGMKill<EDeathReason> gmKill = InGameManager.Instance.CurrentGameMode as IGMKill<EDeathReason>;
+                    gmKill.KillPlayer(victimId, attackerId, 0);
                     return true;
                 }
             }
